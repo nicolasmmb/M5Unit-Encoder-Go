@@ -76,11 +76,11 @@ func TestSetEncoder(t *testing.T) {
 func TestButton(t *testing.T) {
 	bus := newFakeBus()
 	dev := New(bus, 0)
-	bus.regs[RegButton] = []byte{1}
+	bus.regs[RegButton] = []byte{0}
 	if ok, err := dev.Button(); err != nil || !ok {
 		t.Fatalf("Button = %v, %v; want true, nil", ok, err)
 	}
-	bus.regs[RegButton] = []byte{0}
+	bus.regs[RegButton] = []byte{1}
 	if ok, err := dev.Button(); err != nil || ok {
 		t.Fatalf("Button = %v, %v; want false, nil", ok, err)
 	}
@@ -118,8 +118,23 @@ func TestLED(t *testing.T) {
 	if got := bus.regs[RegLED]; string(got) != string(want) {
 		t.Fatalf("LED color = % X, want % X", got, want)
 	}
-	if err := dev.SetLED(2, 0, 0, 0); err == nil {
-		t.Fatal("SetLED with index 2 returned nil")
+	if err := dev.SetLED(2, 0, 0, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := dev.SetLED(3, 0, 0, 0); err == nil {
+		t.Fatal("SetLED with index 3 returned nil")
+	}
+}
+
+func TestReset(t *testing.T) {
+	bus := newFakeBus()
+	dev := New(bus, 0)
+	if err := dev.Reset(); err != nil {
+		t.Fatal(err)
+	}
+	want := []byte{RegReset, 1}
+	if len(bus.writes) != 1 || string(bus.writes[0]) != string(want) {
+		t.Fatalf("writes = % X, want % X", bus.writes, want)
 	}
 }
 

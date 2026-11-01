@@ -12,10 +12,11 @@ const DefaultAddress = 0x40
 
 // Registers exposed by the U135 firmware.
 const (
-	RegMode    = 0x00 // 1 byte
-	RegEncoder = 0x10 // int16 little-endian
-	RegButton  = 0x20 // 1 byte, 1 = pressed
+	RegMode    = 0x00 // 1 byte: 0 = pulse, 1 = AB
+	RegEncoder = 0x10 // int16 little-endian (read/write)
+	RegButton  = 0x20 // 1 byte: 0 = pressed (active low)
 	RegLED     = 0x30 // [index, R, G, B]
+	RegReset   = 0x40 // write 1 to reset the counter
 )
 
 // Bus is the I2C transport. machine.I2C satisfies it through NewI2C.
@@ -87,12 +88,18 @@ func (d *Device) SetEncoder(value int16) error {
 }
 
 // Button reports whether the encoder is pressed (register 0x20).
+// The U135 firmware returns 0 while pressed and 1 while released.
 func (d *Device) Button() (bool, error) {
 	data, err := d.read(RegButton, 1)
 	if err != nil {
 		return false, err
 	}
-	return data[0] != 0, nil
+	return data[0] == 0, nil
+}
+
+// Reset zeroes the encoder counter (register 0x40, write 1).
+func (d *Device) Reset() error {
+	return d.write(RegReset, 1)
 }
 
 // Mode reads the work mode (register 0x00).
@@ -109,10 +116,11 @@ func (d *Device) SetMode(mode uint8) error {
 	return d.write(RegMode, mode)
 }
 
-// SetLED writes one of the two RGB LEDs. index is 0 or 1.
+// SetLED writes the RGB LEDs. index 0 targets both LEDs; 1 and 2 target a
+// single LED.
 func (d *Device) SetLED(index, r, g, b uint8) error {
-	if index > 1 {
-		return fmt.Errorf("encoder: led index %d out of range (0..1)", index)
+	if index > 2 {
+		return fmt.Errorf("encoder: led index %d out of range (0..2)", index)
 	}
 	return d.write(RegLED, index, r, g, b)
 }
