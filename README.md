@@ -75,7 +75,7 @@ _ = dev.SetEncoder(0)
 | `SetMode(m)` | Work mode: `ModePulse` (0) or `ModeAB` (1); write-only |
 | `SetLED(index, r, g, b)` | Set LEDs (0 = both, 1/2 = one) |
 | `SetLEDColor(index, rgb)` | Set LEDs with `0xRRGGBB` |
-| `Reset()` | Zero the encoder counter |
+| `Reset()` | Zero the counter (may be a no-op on some firmware) |
 
 ## References
 

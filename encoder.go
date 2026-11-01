@@ -98,6 +98,8 @@ func (d *Device) Button() (bool, error) {
 }
 
 // Reset zeroes the encoder counter (register 0x40, write 1).
+// Some U135 firmware revisions ignore this register and the counter write;
+// callers that need a guaranteed zero can keep a software offset.
 func (d *Device) Reset() error {
 	return d.write(RegReset, 1)
 }
