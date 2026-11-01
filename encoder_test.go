@@ -86,18 +86,17 @@ func TestButton(t *testing.T) {
 	}
 }
 
-func TestMode(t *testing.T) {
+func TestSetMode(t *testing.T) {
 	bus := newFakeBus()
 	dev := New(bus, 0)
-	bus.regs[RegMode] = []byte{2}
-	if m, err := dev.Mode(); err != nil || m != 2 {
-		t.Fatalf("Mode = %d, %v; want 2", m, err)
-	}
-	if err := dev.SetMode(1); err != nil {
+	if err := dev.SetMode(ModeAB); err != nil {
 		t.Fatal(err)
 	}
-	if got := bus.regs[RegMode][0]; got != 1 {
-		t.Fatalf("mode register = %d, want 1", got)
+	if got := bus.regs[RegMode][0]; got != ModeAB {
+		t.Fatalf("mode register = %d, want %d", got, ModeAB)
+	}
+	if err := dev.SetMode(2); err == nil {
+		t.Fatal("SetMode(2) returned nil")
 	}
 }
 

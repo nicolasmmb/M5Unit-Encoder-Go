@@ -57,7 +57,7 @@ _ = dev.SetEncoder(0)
 
 | Register | Name | Content |
 |---|---|---|
-| `0x00` | Mode | 1 byte |
+| `0x00` | Mode (write-only) | 1 byte: 0 = pulse, 1 = AB |
 | `0x10` | Encoder | `int16` little-endian |
 | `0x20` | Button | 1 byte, 0 = pressed (active low) |
 | `0x30` | RGB LED | `[index, R, G, B]`, index 0 = both, 1/2 = one LED |
@@ -72,7 +72,7 @@ _ = dev.SetEncoder(0)
 | `Init()` | Probe the module |
 | `Encoder()` / `SetEncoder(v)` | Read/write the count |
 | `Button()` | Button state |
-| `Mode()` / `SetMode(m)` | Work mode: 0 = pulse, 1 = AB |
+| `SetMode(m)` | Work mode: `ModePulse` (0) or `ModeAB` (1); write-only |
 | `SetLED(index, r, g, b)` | Set LEDs (0 = both, 1/2 = one) |
 | `SetLEDColor(index, rgb)` | Set LEDs with `0xRRGGBB` |
 | `Reset()` | Zero the encoder counter |

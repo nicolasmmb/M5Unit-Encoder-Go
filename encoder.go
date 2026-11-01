@@ -102,17 +102,18 @@ func (d *Device) Reset() error {
 	return d.write(RegReset, 1)
 }
 
-// Mode reads the work mode (register 0x00).
-func (d *Device) Mode() (uint8, error) {
-	data, err := d.read(RegMode, 1)
-	if err != nil {
-		return 0, err
-	}
-	return data[0], nil
-}
+// Work modes accepted by SetMode.
+const (
+	ModePulse = 0 // pulse counting
+	ModeAB    = 1 // AB quadrature decoding
+)
 
-// SetMode writes the work mode (register 0x00).
+// SetMode writes the work mode (register 0x00). The register is write-only,
+// so there is no getter.
 func (d *Device) SetMode(mode uint8) error {
+	if mode > ModeAB {
+		return fmt.Errorf("encoder: mode %d out of range (0..1)", mode)
+	}
 	return d.write(RegMode, mode)
 }
 
